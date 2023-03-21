@@ -2,12 +2,19 @@
 %one column of data
 %Simtime should be 17 seconds
 
-function fitness = fitnessFunction(sledgeResponse, sledgeSetPoint, pendulumResponse)
-    overshoot = max(abs(sledgeResponse)) - abs(sledgeSetPoint);
-    maxAngleValue = max(abs(pendulumResponse));
+clc
+getFitness([sine_sledge.Time sine_sledge.Data], 0, [sine_angle.Time, sine_angle.Data])
+
+
+function fitness = getFitness(sledgeResponse, sledgeSetPoint, pendulumResponse)
+    overshoot = max(abs(sledgeResponse(:, 2))) - abs(sledgeSetPoint);
+    maxAngleValue = max(abs(pendulumResponse(:, 2)));
     
-    settledDataSledge = getSettledData(sledgeResponse);
-    settledDataPendulum = getSettledData(pendulumResponse);
+    sledgeSettledEpsilon = 0.1;
+    pendulumSettledEpsilon = 0.1;
+
+    settledDataSledge = getSettledData(sledgeResponse, sledgeSettledEpsilon);
+    settledDataPendulum = getSettledData(pendulumResponse, pendulumSettledEpsilon);
 
     sledgeError = abs(settledDataSledge.FinalValue - sledgeSetPoint);
 
@@ -36,7 +43,8 @@ function fitness = fitnessFunction(sledgeResponse, sledgeSetPoint, pendulumRespo
     if sledgeError > 0.02
         sledgeErrorFactor = 1000 * sledgeErrorFactor;
     end
-    
+
+
     %timeToSettle is a function that will calculate the time it takes
         %for the response to settle
     fitness = settledDataSledge.Time * timeFactorSledge + ...
@@ -54,8 +62,23 @@ end
 
 %Return settling time, final value
 
-function settledData = getSettledData(response, errorRange)
+function settledData = getSettledData(response, epsilon)
+    flippedResponse = flipud(response);
+    settledData = struct("Time", 0, "FinalValue", flippedResponse(1, 2));
+    minimumValue = flippedResponse(1, 2);
+    maximumValue = flippedResponse(1, 2);
 
-
-
+    for i = 2:length(flippedResponse)
+        row = flippedResponse(i, :);
+        if minimumValue > row(2)
+            minimumValue = row(2);
+        elseif maximumValue < row(2)
+            maximumValue = row(2);
+        end
+    
+        if abs(maximumValue - minimumValue) > epsilon
+            settledData.Time = row(1);
+            return 
+        end
+    end
 end

@@ -1,11 +1,10 @@
 clc
 clear
 load("GraneResponses.mat");
-load("LowPassFilter.mat");
-load("LowPassFilterObject.mat")
+load("IIRFilter.mat")
 
-data = step_3V_sledge.Data; % Data
-t = step_3V_sledge.Time;        % Time vector
+data = ramp_pos_angle.Data; % Data
+t = ramp_pos_angle.Time;        % Time vector
 T = t(2) - t(1);             % Sampling period       
 Fs = 1/T;            % Sampling frequency                    
 N = length(t);             % Length of signal
