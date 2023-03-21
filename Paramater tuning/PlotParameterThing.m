@@ -37,7 +37,6 @@ sledgeModel = tf([kt/(Ra*rm)], [mj/rm^2 kt*ke/(rm^2*Ra)+Dsm 0]);
 
 figure(2)
 for i = 1:length(inputs)
-    
     subplot(3,3,i);
     y = lsim(sledgeModel, inputs(i).Data,inputs(i).Time);
     plot(inputs(i).Time, y, 'Color', 'blue');

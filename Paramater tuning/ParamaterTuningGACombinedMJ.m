@@ -1,3 +1,4 @@
+%% Initialize variables
 clc
 clear
 load('GraneResponses.mat');
@@ -16,7 +17,23 @@ Lcm =  Lr + hl/2;
 g = 9.82;
 Dp = 0.007;
 Jp = 0.016; %Parameter list says 0.016???
-mj = ms*Jm;
+mj = ms * Jm;
+
+%% Make initial figure
+
+sledgeModel = tf([kt/(Ra*rm)], [mj/rm^2 kt*ke/(rm^2*Ra)+Dsm 0]);
+
+figure(1)
+for i = 1:length(inputs)
+    subplot(3,3,i);
+    y = lsim(sledgeModel, inputs(i).Data,inputs(i).Time);
+    hold off
+    plot(inputs(i).Time, y, 'Color', 'blue');
+    hold on
+    plot(sledgeResponses(i).Time, sledgeResponses(i).Data, 'Color', 'red')
+end
+
+%% Evolutionize genes
 
 popSize = 30;
 maxGens = 50;
@@ -25,21 +42,17 @@ numberOfElites = 3;
 numberOfMutations = popSize - numberOfElites;
 
 
-initialGene = [mj Dsm kt ke];
+initiax`lGene = [mj Dsm kt ke];
 
 pop=repmat(initialGene, [popSize 1]); %repmat(initialGene, [popSize 1]);
 
 sigmaVec = initialGene;
-%pendulumModel = tf([Lcm*ml+Lr/2*mr 0 0], [Jp Dp Lcm*ml+Lr/2*mr]);
-
-
 
 inputs = [bang_input, ramp_neg_input, ramp_pos_input, staircase_input, step_3V_input, step_2V_input, sine_input];
 sledgeResponses = [bang_sledge, ramp_neg_sledge, ramp_pos_sledge, staircase_sledge, step_3V_sledge, step_2V_sledge, sine_sledge];
 
 
-weights = [1, 0, 0, 0, 0, 0, 0];
-
+weights = [10, 1, 1, 1, 1, 1, 1];
 
 for generation = 1:maxGens
     popFitnesses = zeros(popSize,1);
@@ -76,10 +89,24 @@ for generation = 1:maxGens
         );
     end
 end
+
+%% Plot best gene
+
 [a, bestThisGeneration] = min(popFitnesses);
-disp([a, bestThisGeneration])
+bestGene = pop(bestThisGeneration, :);
+newValues = num2cell(bestGene);
+[mj, Dsm, kt, ke] = newValues{:};
+sledgeModel = tf([kt/(Ra*rm)], [mj/rm^2 kt*ke/(rm^2*Ra)+Dsm 0]);
 
-
+figure(2)
+for i = 1:length(inputs)
+    subplot(3,3,i);
+    y = lsim(sledgeModel, inputs(i).Data,inputs(i).Time);
+    hold off
+    plot(inputs(i).Time, y, 'Color', 'blue');
+    hold on
+    plot(sledgeResponses(i).Time, sledgeResponses(i).Data, 'Color', 'red')
+end
 
 
 function error = calculateError(x, xHat)
