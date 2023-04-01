@@ -1,8 +1,0 @@
-Best model parameters for the sledge:
-
-newValues = num2cell([6.50966186168443e-05 2.54521253558318 0.418590929040413 0.0706376302151075]);
-[mj, Dsm, kt, ke] = newValues{:};
-
-Best model parameters for the pendulum:
-
-
