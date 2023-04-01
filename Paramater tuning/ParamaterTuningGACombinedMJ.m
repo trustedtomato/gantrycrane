@@ -1,7 +1,7 @@
 %% Initialize variables
 clc
 clear
-load('GraneResponses.mat');
+load('GraneResponsesWithVoltageOffset.mat');
 Ra = 4.2;
 Jm = 0.0000218;
 rm = 0.7/100;
@@ -18,6 +18,8 @@ g = 9.82;
 Dp = 0.007;
 Jp = 0.016; %Parameter list says 0.016???
 mj = ms * Jm;
+inputs = [small_bang_input, small_ramp_input, small_step_input, small_sine_input, big_bang_input, big_ramp_input, big_step_input, big_sine_input];
+sledgeResponses = [small_bang_sledge, small_ramp_sledge, small_step_sledge, small_sine_sledge, big_bang_sledge, big_ramp_sledge, big_step_sledge, big_sine_sledge];
 
 %% Make initial figure
 
@@ -42,17 +44,17 @@ numberOfElites = 3;
 numberOfMutations = popSize - numberOfElites;
 
 
-initiax`lGene = [mj Dsm kt ke];
+initialGene = [mj Dsm kt ke];
 
 pop=repmat(initialGene, [popSize 1]); %repmat(initialGene, [popSize 1]);
 
 sigmaVec = initialGene;
 
-inputs = [bang_input, ramp_neg_input, ramp_pos_input, staircase_input, step_3V_input, step_2V_input, sine_input];
-sledgeResponses = [bang_sledge, ramp_neg_sledge, ramp_pos_sledge, staircase_sledge, step_3V_sledge, step_2V_sledge, sine_sledge];
 
-
-weights = [10, 1, 1, 1, 1, 1, 1];
+weights = [1 1 1 1 1 1 1 1];
+for i = 1:length(inputs)
+    weights(i) = 1/(sum(inputs(i).Data.^2) * length(inputs(i).Time));
+end
 
 for generation = 1:maxGens
     popFitnesses = zeros(popSize,1);
@@ -67,7 +69,6 @@ for generation = 1:maxGens
             xHat = sledgeResponses(i).Data;
             error = calculateError(x, xHat);
             popFitnesses(j) = popFitnesses(j) + error*weights(i);
-
         end
     end
     
