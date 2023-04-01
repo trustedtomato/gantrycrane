@@ -2,8 +2,6 @@
 %one column of data
 %Simtime should be 17 seconds
 
-clc
-getFitness([sine_sledge.Time sine_sledge.Data], 0, [sine_angle.Time, sine_angle.Data])
 
 
 function fitness = getFitness(sledgeResponse, sledgeSetPoint, pendulumResponse)
@@ -20,7 +18,7 @@ function fitness = getFitness(sledgeResponse, sledgeSetPoint, pendulumResponse)
 
 
     %The way that I arrived at these values was that I thought about what
-    %would correspond to a fitness of 1. So 15°, 15 seconds to settle
+    %would correspond to a fitness of 1. So 15??, 15 seconds to settle
     %the sledge and 20 seconds to settle the pendulum.
     angleFactor = 1/deg2rad(15); 
     timeFactorSledge = 1/10;
@@ -64,7 +62,7 @@ end
 
 function settledData = getSettledData(response, epsilon)
     flippedResponse = flipud(response);
-    settledData = struct("Time", 0, "FinalValue", flippedResponse(1, 2));
+    settledData = struct('Time', 0, 'FinalValue', flippedResponse(1, 2));
     minimumValue = flippedResponse(1, 2);
     maximumValue = flippedResponse(1, 2);
 
