@@ -1,4 +1,4 @@
-function gene = optimizeModel(inputs, responses, weights, initialGene, getModel)
+function gene = optimizeModelGene(inputs, responses, weights, initialGene, getModel)
     gene = optimizeGene(initialGene, 30, 50, @fitnessFunction);
 
     % for j = 1:length(inputs)

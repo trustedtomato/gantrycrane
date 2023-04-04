@@ -15,9 +15,9 @@ function calculateOptimizedModel()
     initialGene = [mj Dsm kt ke];
     
     %% Make initial figure
-    
+
     model = getModel(initialGene);
-    
+
     figure(1)
     for i = 1:length(inputs)
         subplot(3,3,i);
@@ -30,7 +30,7 @@ function calculateOptimizedModel()
     
     %% Evolutionize genes
 
-    bestGene = optimizeModel(inputs, responses, weights, initialGene, @getModel);
+    bestGene = optimizeModelGene(inputs, responses, weights, initialGene, @getModel);
     model = getModel(bestGene);
     
     %% Plot best gene
@@ -52,6 +52,6 @@ function calculateOptimizedModel()
             newValues = num2cell(gene);
             [mj, Dsm, kt, ke] = newValues{:};
         end
-        model = tf([kt/(Ra*rm)], [mj/rm^2 kt*ke/(rm^2*Ra)+Dsm 0]);
+        model = tf(kt/(Ra*rm), [mj/rm^2 kt*ke/(rm^2*Ra)+Dsm 0]);
     end
 end
