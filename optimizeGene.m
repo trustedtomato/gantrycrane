@@ -1,4 +1,4 @@
-function bestGene = optimizeGene(initialGene, popSize, maxGens, fitnessFunction)
+function bestGene = optimizeGene(initialGene, popSize, maxGens, fitnessFunction, onNewGeneration)
     numberOfElites = ceil(popSize / 10);
     
     pop = repmat(initialGene, [popSize 1]); %repmat(initialGene, [popSize 1]);
@@ -33,9 +33,12 @@ function bestGene = optimizeGene(initialGene, popSize, maxGens, fitnessFunction)
                 sigmaVec./(((3-0.8)*generation/maxGens)+0.8) ...
             );
         end
-    end
+        [bestFitness, indexOfBest] = min(popFitnesses);
+        bestGene = pop(indexOfBest, :);
 
-    [bestFitness, indexOfBest] = min(popFitnesses);
-    bestGene = pop(indexOfBest, :);
+        if exist('onNewGeneration', 'var')
+            onNewGeneration(bestGene, bestFitness);
+        end
+    end
 end
 
