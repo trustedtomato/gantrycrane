@@ -1,7 +1,7 @@
 %% Variable initialisation
 clear
 clc
-load('GraneResponses.mat');
+load('GraneResponsesWithVoltageOffset.mat');
 Ra = 4.2;
 Jm = 0.0000218;
 rm = 0.7/100;

@@ -2,8 +2,8 @@
 load("GraneResponses.mat");
 load("IIRAngleFilterObject.mat")
 
-data = test_angle.Data; % Data
-t = test_angle.Time;        % Time vector
+data = angleResponse.Data; % Data
+t = angleResponse.Time;        % Time vector
 T = t(2) - t(1);             % Sampling period       
 Fs = 1/T;            % Sampling frequency                    
 N = length(t);             % Length of signal

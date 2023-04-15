@@ -23,14 +23,14 @@ function fitness = getFitness(sledgeResponse, sledgeSetPoint, pendulumResponse)
     angleFactor = 1/deg2rad(15); 
     timeFactorSledge = 1/10;
     timeFactorPendulum = 1/10;
-    overshootFactor = 0;
+    overshootFactor = 1/0.05;
     sledgeErrorFactor = 1/0.02;
     
     if maxAngleValue > deg2rad(15)
         angleFactor = angleFactor * 1000;
     end
     if overshoot > 0.05
-        overshootFactor = 100000 * (overshoot + 1); 
+        overshootFactor = 100000 * overshootFactor; 
     end
     if settledDataSledge.Time > 15
         timeFactorSledge = 1000 * timeFactorSledge;
@@ -48,7 +48,7 @@ function fitness = getFitness(sledgeResponse, sledgeSetPoint, pendulumResponse)
     fitness = settledDataSledge.Time * timeFactorSledge + ...
         settledDataPendulum.Time * timeFactorPendulum +...
         maxAngleValue * angleFactor +...
-        overshootFactor +...
+        overshootFactor * overshoot +...
         sledgeErrorFactor * sledgeError;
 end
 

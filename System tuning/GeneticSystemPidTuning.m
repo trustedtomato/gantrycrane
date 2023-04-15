@@ -3,16 +3,15 @@ clc
 
 addpath('../')
 
-%initialGene = [8.585832613440052,0.001735765546477,15.990838535968841,1.516562558152844];
 try
-    fileID = fopen('bestParallelGene.bin');
+    fileID = fopen('../Controller tuning/bestParallelGene.bin');
     initialGene = fread(fileID, [1 4], 'double');
     fclose(fileID);
 catch ME
     initialGene = [1 1 1 1];
 end
 
-optimizedGene = optimizeGene(initialGene, 5, 5, @fitnessFunction, @logBestGene);
+optimizedGene = optimizeGene(initialGene, 20, 20, @fitnessFunction, @logBestGene);
 
 %% Run and plot the response with optimized gene
 run("../GlobalVariables.m");
@@ -24,7 +23,7 @@ setPoint = 0.5;
 
 % TODO: use setPoint as the set point, and rename p_in to pIn, etc.
 % sets positionResponse and angleResponse
-sim("../controllers/ParallelNewModel", 17, options);
+sim("../controllers/ParallelNew", 17, options);
 
 fitness = getFitness([positionResponse.Time positionResponse.Data], setPoint, [angleResponse.Time angleResponse.Data]);
 
@@ -47,7 +46,7 @@ function fitness = fitnessFunction (gene)
 
     % TODO: use setPoint as the set point, and rename p_in to pIn, etc.
     % sets positionResponse and angleResponse
-    sim("../controllers/ParallelNewModel", 17, options);
+    sim("../controllers/ParallelNew", 17, options);
 
     fitness = getFitness([positionResponse.Time positionResponse.Data], setPoint, [angleResponse.Time angleResponse.Data]);
 end
