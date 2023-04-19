@@ -10,7 +10,7 @@ function bestGene = optimizeGene(initialGene, popSize, maxGens, fitnessFunction,
         pop = abs(pop);
 
         % Calculate gene fitnesses
-        for j = 1:popSize
+        parfor j = 1:popSize
             popFitnesses(j) = fitnessFunction(pop(j,:));
         end
         
@@ -37,8 +37,9 @@ function bestGene = optimizeGene(initialGene, popSize, maxGens, fitnessFunction,
         bestGene = pop(indexOfBest, :);
 
         if exist('onNewGeneration', 'var')
-            onNewGeneration(bestGene, bestFitness);
+            onNewGeneration(bestGene, bestFitness, generation);
         end
     end
+    delete(gcp('nocreate'));
 end
 

@@ -54,7 +54,7 @@ function fitness = fitnessFunction (gene)
     fitness = getFitness([positionResponse.Time positionResponse.Data], setPoint, [angleResponse.Time angleResponse.Data]);
 end
 
-function logBestGene(bestGene, bestFitness)
+function logBestGene(bestGene, bestFitness, generation)
     fileID = fopen('bestCascadeGene.bin','w');
     nbytes = fwrite(fileID, [bestGene bestFitness], 'double');
     fclose(fileID);
