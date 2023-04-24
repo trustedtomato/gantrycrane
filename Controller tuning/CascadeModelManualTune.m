@@ -37,7 +37,7 @@ grid on;
 subplot(2,1,2);
 hold on;
 grid on;
-KpArray = [0.1, 0.5, 1, 2, 5, 10, 20, 50, 75, 100];
+KpArray = [0.01, 0.05, 0.1, 0.2, 0.3, 0.5, 1, 5, 10, 50, 100];
 colorMap = turbo(length(KpArray));
 legendInfo = cell(1, length(KpArray));
 for i = 1:length(KpArray)
@@ -55,7 +55,7 @@ for i = 1:length(KpArray)
     % plot(angleResponse.time, angleResponse.data, 'Color', colorMap(i, :))
     plot(angleResponse.time, angleResponse.data)
     % add legend containing the Kp values and the fitness values through getFitness
-    legendInfo{i} = ['Kp = ' num2str(Kp) ' Fitness = ' num2str(getFitness([positionResponse.time positionResponse.data], 0.5, [angleResponse.time angleResponse.data]))];
+    legendInfo{i} = ['Kp = ' num2str(Kp) ' fitness: ' num2str(getFitness([positionResponse.time positionResponse.data], 0.5, [angleResponse.time angleResponse.data]))];
     
 end
 
