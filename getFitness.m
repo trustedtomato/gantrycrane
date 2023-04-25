@@ -8,8 +8,8 @@ function fitness = getFitness(sledgeResponse, sledgeSetPoint, pendulumResponse)
     overshoot = max(abs(sledgeResponse(:, 2))) - abs(sledgeSetPoint);
     maxAngleValue = max(abs(pendulumResponse(:, 2)));
     
-    sledgeSettledEpsilon = 0.1;
-    pendulumSettledEpsilon = 0.1;
+    sledgeSettledEpsilon = 1.2 / 100; % 1% of 1.2m track length
+    pendulumSettledEpsilon = deg2rad(15 / 100); % 1% of 15 degrees
 
     settledDataSledge = getSettledData(sledgeResponse, sledgeSettledEpsilon);
     settledDataPendulum = getSettledData(pendulumResponse, pendulumSettledEpsilon);
