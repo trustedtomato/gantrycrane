@@ -25,6 +25,12 @@ function bestGene = optimizeGene(initialGene, popSize, maxGens, fitnessFunction,
 
         % Mutate genes which are not among the elites
         indicesOfMutations = setdiff(1:length(popFitnesses), indicesOfElites);
+        [bestFitness, indexOfBest] = min(popFitnesses);
+        bestGene = pop(indexOfBest, :);
+
+        if exist('onNewGeneration', 'var')
+            onNewGeneration(bestGene, bestFitness, generation);
+        end
 
         for i = 1:length(indicesOfMutations)
             currentIndex = indicesOfMutations(i);
@@ -32,12 +38,6 @@ function bestGene = optimizeGene(initialGene, popSize, maxGens, fitnessFunction,
                 pop(currentIndex, :), ...
                 pop(currentIndex, :)./(((3-0.8)*generation/maxGens)+0.8) ...
             );
-        end
-        [bestFitness, indexOfBest] = min(popFitnesses);
-        bestGene = pop(indexOfBest, :);
-
-        if exist('onNewGeneration', 'var')
-            onNewGeneration(bestGene, bestFitness, generation);
         end
     end
     delete(gcp('nocreate'));
