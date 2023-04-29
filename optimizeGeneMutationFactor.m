@@ -19,7 +19,7 @@ function bestGene = optimizeGeneMutationFactor(initialGene, popSize, maxGens, fi
         bestGene = pop(indexOfBest, :);
 
         if exist('onNewGeneration', 'var')
-            onNewGeneration(bestGene, bestFitness, generation, pop, popFitnesses);
+            onNewGeneration(bestGene, bestFitness, generation);
         end
         
         [~, sortedPopIndices] = mink(popFitnesses, popSize);
