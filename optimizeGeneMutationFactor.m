@@ -9,7 +9,7 @@ function bestGene = optimizeGeneMutationFactor(initialGene, popSize, maxGens, fi
         popFitnesses = zeros(popSize,1);
         pop = abs(pop);
         % Calculate gene fitnesses
-        for j = 1:popSize
+        parfor j = 1:popSize
             popFitnesses(j) = fitnessFunction(pop(j,:));
         end
         
