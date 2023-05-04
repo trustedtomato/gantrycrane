@@ -3,7 +3,6 @@ clc
 
 addpath('../')
 
-%initialGene = [8.585832613440052,0.001735765546477,15.990838535968841,1.516562558152844];
 try
     fileID = fopen('bestParallelGene.bin');
     initialGene = fread(fileID, [1 4], 'double');
@@ -12,10 +11,12 @@ catch ME
     initialGene = [1 1 1 1];
 end
 
-optimizedGene = optimizeGene(initialGene, 5, 5, @fitnessFunction, @logBestGene);
+optimizedGene = optimizeGene(initialGene, 100, 100, @fitnessFunction, @logBestGene);
+% optimizedGene = [2.269 4.5205e-06 3.6344 0.011028];
 
 %% Run and plot the response with optimized gene
 run("../GlobalVariables.m");
+load("Results\NoisyAngleResponse.mat");
 options = simset('SrcWorkspace', 'current');
 newValues = num2cell(optimizedGene);
 [SKp, SKi, PKp, PKi] = newValues{:};
@@ -39,6 +40,7 @@ grid on
 
 function fitness = fitnessFunction (gene)
     run("../GlobalVariables.m");
+    load("Results\NoisyAngleResponse.mat");
     options = simset('SrcWorkspace', 'current');
     newValues = num2cell(gene);
     [SKp, SKi, PKp, PKi] = newValues{:};
@@ -52,7 +54,14 @@ function fitness = fitnessFunction (gene)
     fitness = getFitness([positionResponse.Time positionResponse.Data], setPoint, [angleResponse.Time angleResponse.Data]);
 end
 
-function logBestGene(bestGene, bestFitness)
+function logBestGene(bestGene, bestFitness, generation)
+    fprintf('-\n-\n-\n')
+    disp('Logging best gene and fitness:')
+    disp(num2str(bestGene))
+    disp(num2str(bestFitness))
+    currentTime = clock;
+    fprintf('Simulating %d generation finished at %02d:%02d:%02d.\n', generation, currentTime(4), currentTime(5), round(currentTime(6)));
+    fprintf('-\n-\n-\n')
     fileID = fopen('bestParallelGene.bin','w');
     nbytes = fwrite(fileID, [bestGene bestFitness], 'double');
     fclose(fileID);
