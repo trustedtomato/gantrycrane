@@ -1,17 +1,19 @@
 %% Initialize variables
 clc
 clear
-
+format long
+addpath('../')
+run("../GlobalVariables.m");
 calculateOptimizedModel()
 
 function calculateOptimizedModel()
     d = load('GraneResponsesWithVoltageOffset.mat');
     load ../GlobalVariables.mat mj Dsm kt ke rm Ra
 
-    inputs = [d.small_bang_input, d.small_ramp_input, d.small_step_input, d.small_sine_input, d.big_bang_input, d.big_ramp_input, d.big_step_input, d.big_sine_input];
-    responses = [d.small_bang_sledge, d.small_ramp_sledge, d.small_step_sledge, d.small_sine_sledge, d.big_bang_sledge, d.big_ramp_sledge, d.big_step_sledge, d.big_sine_sledge];
+    inputs = [d.bang3vInput, d.rampInput, d.step1vInput, d.sine3vInput, d.step4vInput];
+    responses = [d.bang3vPositionResponse, d.rampPositionResponse, d.step1vPositionResponse, d.sine3vPositionResponse, d.step4vPositionResponse];
 
-    weights = [1 1 1 1 1 1 1 1];
+    weights = [1 1 1 1 1];
     initialGene = [mj Dsm kt ke];
     
     %% Make initial figure
@@ -32,14 +34,12 @@ function calculateOptimizedModel()
 
     bestGene = optimizeModelGene(inputs, responses, weights, initialGene, @getModel);
     model = getModel(bestGene);
-    
+    bestGene
     %% Plot best gene
     
     figure(2)
     for i = 1:length(inputs)
         subplot(3, 3, i);
-        inputs(i).Data
-        inputs(i).Time
         y = lsim(model, inputs(i).Data, inputs(i).Time);
         hold off
         plot(inputs(i).Time, y, 'Color', 'blue');
