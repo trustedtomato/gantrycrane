@@ -2,8 +2,8 @@
 load("GraneResponses.mat");
 load("IIRAngleFilterObject.mat")
 
-data = angleResponse.Data; % Data
-t = angleResponse.Time;        % Time vector
+data = angleResponseLockedWheel.Data; % Data
+t = angleResponseLockedWheel.Time;        % Time vector
 T = t(2) - t(1);             % Sampling period       
 Fs = 1/T;            % Sampling frequency                    
 N = length(t);             % Length of signal

@@ -13,14 +13,14 @@ Lcm = Lr + hl/2;
 g = 9.82;
 Dp = 0.007;
 Jp = 0.016; %Parameter list says 0.016???
-mj = ms * Jm;
+mj = (ms + ml + mr) * Jm;
 
 % Use the most up-to-date good gene we found for the sledge model
-newValues = num2cell([6.50966186168443e-05 2.54521253558318 0.418590929040413 0.0706376302151075]);
+newValues = num2cell([0.000000072062003   4.808165222544377   0.013630362230646   0.003287543558176]);
 [mj, Dsm, kt, ke] = newValues{:};
 
 % Use the most up-to-date good gene we found for the pendulum model
-newValues = num2cell([0.0155847761214082 0.00264359975409834]);
+newValues = num2cell([0.013551853285670   0.001390599626095]);
 [Jp, Dp] = newValues{:};
 
 continuousSledgeModel = tf(kt/(Ra*rm), [mj/rm^2 kt*ke/(rm^2*Ra)+Dsm 0]);
@@ -28,3 +28,5 @@ continuousPendulumModel = tf([(Lcm * ml + Lr/2*mr) 0 0], [Jp Dp (Lcm * ml + Lr *
 
 discreteSledgeModel = c2d(continuousSledgeModel, 1/100);
 discretePendulumModel = c2d(continuousPendulumModel, 1/100);
+
+save GlobalVariables.mat

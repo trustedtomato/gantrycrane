@@ -11,12 +11,11 @@ catch ME
     initialGene = [1 1 1 1];
 end
 
-optimizedGene = optimizeGene(initialGene, 100, 100, @fitnessFunction, @logBestGene);
+optimizedGene = optimizeGene(initialGene, 20, 20, @fitnessFunction, @logBestGene);
 % optimizedGene = [2.269 4.5205e-06 3.6344 0.011028];
 
 %% Run and plot the response with optimized gene
 run("../GlobalVariables.m");
-load("Results\NoisyAngleResponse.mat");
 options = simset('SrcWorkspace', 'current');
 newValues = num2cell(optimizedGene);
 [SKp, SKi, PKp, PKi] = newValues{:};
@@ -40,7 +39,6 @@ grid on
 
 function fitness = fitnessFunction (gene)
     run("../GlobalVariables.m");
-    load("Results\NoisyAngleResponse.mat");
     options = simset('SrcWorkspace', 'current');
     newValues = num2cell(gene);
     [SKp, SKi, PKp, PKi] = newValues{:};

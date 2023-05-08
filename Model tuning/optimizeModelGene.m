@@ -1,9 +1,9 @@
 function gene = optimizeModelGene(inputs, responses, weights, initialGene, getModel)
-    gene = optimizeGene(initialGene, 30, 50, @fitnessFunction);
+    gene = optimizeGene(initialGene, 20, 20, @fitnessFunction);
 
-    % for j = 1:length(inputs)
-    %     weights(j) = weights(j) * length(inputs(j).Time) / sum(inputs(j).Data.^2);
-    % end
+    for j = 1:length(inputs)
+        weights(j) = weights(j) * length(inputs(j).Time) / sum(inputs(j).Data.^2);
+    end
 
     function fitness = fitnessFunction (gene)
         fitness = 0;
