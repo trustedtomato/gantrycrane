@@ -4,43 +4,48 @@ close all
 
 addpath('../')
 run("../GlobalVariables.m");
+set(groot, 'defaultTextInterpreter','latex');
+set(groot, 'defaultLegendInterpreter','latex');
+set(groot, 'defaultAxesTickLabelInterpreter','latex');
+set(groot, 'defaultAxesFontSize', 12);
+set(groot, 'defaultLegendFontSize', 12);
 
-% %%
-% try
-%     fileID = fopen('bestCascadeGene_SledgeOuterPendulumInner.bin');
-%     initialGene = fread(fileID, [1 6], 'double');
-%     fclose(fileID);
-% catch ME
-%     initialGene = [1 1 1 1 1 1];
-% end
-
-
-% % initialGene = [0.65 0 0 28 0 3.7]; % best genetically tuned results from [1 1 1 1 1 1]
-% initialGene = [0.5 0 0.0001 13 0 0.5]; % best sledge outer pendulum inner manually tuned values
-% populationSize = 50;
-% generations = 50;
-% %global fitnesses Nth everyNthGenerationsBestGenes sledgeOuterPendulumInner;
-% fitnesses = zeros(1, generations);
-% Nth = 1;
-% everyNthGenerationsBestGenes = zeros(generations/Nth, 6);
-% sledgeOuterPendulumInner = true;
-
+% % %%
+% % try
+% %     fileID = fopen('bestCascadeGene_SledgeOuterPendulumInner.bin');
+% %     initialGene = fread(fileID, [1 6], 'double');
+% %     fclose(fileID);
+% % catch ME
+% %     initialGene = [1 1 1 1 1 1];
+% % end
+% 
+% 
+% % initialGene = [0.25 0 0.0001 30 0 0.0001]; % best sledge outer pendulum inner manually tuned values
+% initialGene = [1 1 1 1 1 1];
+populationSize = 100;
+generations = 100;
+global fitnesses Nth everyNthGenerationsBestGenes sledgeOuterPendulumInner;
+fitnesses = zeros(1, generations);
+Nth = 20;
+everyNthGenerationsBestGenes = zeros(generations/Nth, 6);
+sledgeOuterPendulumInner = true;
+% 
 % %% Optimize cascade controller with Sledge as outer loop and Pendulum as inner loop
 % optimizedGene = optimizeGene(initialGene, populationSize, generations, @fitnessFunction, @logBestGene);
-
+% 
 % %% Run and plot the response with optimized gene
 % options = simset('SrcWorkspace', 'current');
 % newValues = num2cell(optimizedGene);
 % [OuterKp, OuterKi, OuterKd, InnerKp, InnerKi, InnerKd] = newValues{:};
-
+% 
 % setPoint = 0.5;
-
-% % TODO: use setPoint as the set point, and rename p_in to pIn, etc.
+% 
 % % sets positionResponse and angleResponse
+% recordedNoise = getRecordedNoise();
 % sim("../controllers/CascadeModelSledgeOuterPendulumInnerForGeneticTuning", 17, options);
-
+% 
 % fitness = getFitness([positionResponse.Time positionResponse.Data], setPoint, [angleResponse.Time angleResponse.Data]);
-
+% 
 % figure('Name', 'Cascade Model Sledge Outer Pendulum Inner Genetic Tuning Best Gene Response');
 % subplot(2,1,1);
 % plot(positionResponse.Time, positionResponse.Data);
@@ -65,6 +70,7 @@ run("../GlobalVariables.m");
 %     newValues = num2cell(everyNthGenerationsBestGenes(i,:));
 %     [OuterKp, OuterKi, OuterKd, InnerKp, InnerKi, InnerKd] = newValues{:};
 %     setPoint = 0.5;
+%     recordedNoise = getRecordedNoise();
 %     sim("../controllers/CascadeModelSledgeOuterPendulumInnerForGeneticTuning", 17, options);
 %     subplot(2,1,1);
 %     hold on;
@@ -96,10 +102,9 @@ catch ME
 end
 
 
-populationSize = 50;
-generations = 50;
-%initialGene = [2 0.001 0.2 500 0.001 2.5];
-initialGene = [2 0 0.2 10 0 0.0001]; % best pendulum outer sledge inner manually tuned values
+
+%initialGene = [2 0 0.0001 8 0.16 0.0001]; % best pendulum outer sledge inner manually tuned values
+initialGene = [1 1 1 1 1 1];
 optimizedGene = optimizeGene(initialGene, populationSize, generations, @fitnessFunction, @logBestGene);
 %%
 options = simset('SrcWorkspace', 'current');
@@ -107,8 +112,8 @@ newValues = num2cell(optimizedGene);
 [OuterKp, OuterKi, OuterKd, InnerKp, InnerKi, InnerKd] = newValues{:};
 setPoint = 0.5;
 
-% TODO: use setPoint as the set point, and rename p_in to pIn, etc.
 % sets positionResponse and angleResponse
+recordedNoise = getRecordedNoise();
 sim("../controllers/CascadeModelPendulumOuterSledgeInnerForGeneticTuning", 17, options);
 
 fitness = getFitness([positionResponse.Time positionResponse.Data], setPoint, [angleResponse.Time angleResponse.Data]);
@@ -137,6 +142,7 @@ for i = 1:generations/Nth
     newValues = num2cell(everyNthGenerationsBestGenes(i,:));
     [OuterKp, OuterKi, OuterKd, InnerKp, InnerKi, InnerKd] = newValues{:};
     setPoint = 0.5;
+    recordedNoise = getRecordedNoise();
     sim("../controllers/CascadeModelPendulumOuterSledgeInnerForGeneticTuning", 17, options);
     subplot(2,1,1);
     hold on;
@@ -162,25 +168,20 @@ legend(legendInfo)
 function fitness = fitnessFunction (gene)
     % global sledgeOuterPendulumInner;
     run("../GlobalVariables.m");
+    recordedNoise = getRecordedNoise();
     options = simset('SrcWorkspace', 'current');
     newValues = num2cell(gene);
     [OuterKp, OuterKi, OuterKd, InnerKp, InnerKi, InnerKd] = newValues{:};
     
     setPoint = 0.5;
-    % sets positionResponse and angleResponse
-    % if (sledgeOuterPendulumInner)
-    %     sim("../controllers/CascadeModelSledgeOuterPendulumInnerForGeneticTuning", 17, options);
-    % else
-    %     sim("../controllers/CascadeModelPendulumOuterSledgeInnerForGeneticTuning", 17, options);
-    % end
-    % sim("../controllers/CascadeModelSledgeOuterPendulumInnerForGeneticTuning", 17, options);
+    %sim("../controllers/CascadeModelSledgeOuterPendulumInnerForGeneticTuning", 17, options);
     sim("../controllers/CascadeModelPendulumOuterSledgeInnerForGeneticTuning", 17, options);
 
     fitness = getFitness([positionResponse.Time positionResponse.Data], setPoint, [angleResponse.Time angleResponse.Data]);
 end
 
 function logBestGene(bestGene, bestFitness, generation)
-    % global fitnesses Nth everyNthGenerationsBestGenes sledgeOuterPendulumInner;
+    global fitnesses Nth everyNthGenerationsBestGenes sledgeOuterPendulumInner;
     % % save the best gene and its fitness to a file
     % if(sledgeOuterPendulumInner)
     %     fileID = fopen('bestCascadeGene_SledgeOuterPendulumInner.bin','w');
@@ -192,10 +193,17 @@ function logBestGene(bestGene, bestFitness, generation)
     nbytes = fwrite(fileID, [bestGene bestFitness], 'double');
     fclose(fileID);
     disp("Generation " + generation + " Best Gene: " + num2str(bestGene) + " Fitness: " + bestFitness);
-    % save the best gene and its fitness to a global variable
-    % fitnesses(generation) = bestFitness;
-    % % save the best gene for every Nth generation to a global variable
-    % if mod(generation, Nth) == 0
-    %     everyNthGenerationsBestGenes(generation/Nth, :) = bestGene(:);
-    % end
+    %save the best gene and its fitness to a global variable
+    fitnesses(generation) = bestFitness;
+    %save the best gene for every Nth generation to a global variable
+    if mod(generation, Nth) == 0
+        everyNthGenerationsBestGenes(generation/Nth, :) = bestGene(:);
+    end
+end
+
+function recordedNoise = getRecordedNoise()
+    pendulumNoise = load("Results\\goodNoisyAngleResponse2min.mat").angleResponse;
+    pendulumNoise = pendulumNoise + 0.0065;
+    randomStartIndex = randi([1, 12000-1700]);
+    recordedNoise = timeseries(pendulumNoise.Data(randomStartIndex:(randomStartIndex + 1700)), [0:0.01:17]);
 end
