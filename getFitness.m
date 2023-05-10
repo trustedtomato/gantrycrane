@@ -9,10 +9,10 @@ function fitness = getFitness(sledgeResponse, sledgeSetPoint, pendulumResponse)
     maxAngleValue = max(abs(pendulumResponse(:, 2)));
     
     sledgeSettledEpsilon = 1.2 / 100; % 1% of 1.2m track length
-    pendulumSettledEpsilon = deg2rad(15 / 100); % 1% of 15 degrees
+    pendulumSettledEpsilon = deg2rad(5 * 15 / 100); % 5% of 15 degrees
 
-    settledDataSledge = getSettledData(sledgeResponse, sledgeSettledEpsilon);
-    settledDataPendulum = getSettledData(pendulumResponse, pendulumSettledEpsilon);
+    settledDataSledge = getSledgeSettledData(sledgeResponse, sledgeSettledEpsilon);
+    settledDataPendulum = getPendulumSettledData(pendulumResponse, pendulumSettledEpsilon);
 
     sledgeError = abs(settledDataSledge.FinalValue - sledgeSetPoint);
 
@@ -32,7 +32,7 @@ function fitness = getFitness(sledgeResponse, sledgeSetPoint, pendulumResponse)
     if overshoot > 0.05
         overshootFactor = 100000 * overshootFactor; 
     end
-    if settledDataSledge.Time > 15
+    if settledDataSledge.Time > 12
         timeFactorSledge = 1000 * timeFactorSledge;
     end
     if settledDataPendulum.Time > 15
@@ -52,31 +52,28 @@ function fitness = getFitness(sledgeResponse, sledgeSetPoint, pendulumResponse)
         sledgeErrorFactor * sledgeError;
 end
 
-%Stability checking by looking at the change in amplitude difference of
-%peaks and valleys
 
-%From end of response, store maximum and minimum value until maximum and
-%minimum are further apart than the error range
-
-%Return settling time, final value
-
-function settledData = getSettledData(response, epsilon)
+function settledData = getPendulumSettledData(response, pendulumSettledEpsilon)
     flippedResponse = flipud(response);
     settledData = struct('Time', 0, 'FinalValue', flippedResponse(1, 2));
-    minimumValue = flippedResponse(1, 2);
-    maximumValue = flippedResponse(1, 2);
 
     for i = 2:length(flippedResponse)
-        row = flippedResponse(i, :);
-        if minimumValue > row(2)
-            minimumValue = row(2);
-        elseif maximumValue < row(2)
-            maximumValue = row(2);
+        if abs(flippedResponse(i, 2) - 0) > pendulumSettledEpsilon
+            settledData.Time = flippedResponse(i, 1);
+            break;
         end
-    
-        if abs(maximumValue - minimumValue) > epsilon
-            settledData.Time = row(1);
-            return 
+    end
+end
+
+function settledData = getSledgeSettledData(response, sledgeSettledEpsilon)
+    flippedResponse = flipud(response);
+    finalValue = flippedResponse(1, 2);
+    settledData = struct('Time', 0, 'FinalValue', finalValue);
+
+    for i = 2:length(flippedResponse)
+        if abs(flippedResponse(i, 2) - finalValue) > sledgeSettledEpsilon
+            settledData.Time = flippedResponse(i, 1);
+            break;
         end
     end
 end
